@@ -116,3 +116,26 @@ resource "aws_s3_object" "style_css" {
     aws_s3_bucket_public_access_block.example
   ]
 }
+
+# --- Route 53 Configuration ---
+
+# Retrieve the Hosted Zone ID for your 'loonymoony.click' domain
+data "aws_route53_zone" "selected_zone" {
+  name         = "loonymoony.click."
+  private_zone = false               
+}
+
+# Create the A record for the root domain 'loonymoony.click'
+resource "aws_route53_record" "www_alias" {
+  zone_id = data.aws_route53_zone.selected_zone.zone_id
+  name    = "loonymoony.click" # The root domain
+  type    = "A"
+
+  # Alias record configuration
+  alias {
+    name = aws_s3_bucket_website_configuration.static_website_config.website_domain
+    zone_id = var.hosted_zone_id_us-east-1
+    evaluate_target_health = true # Set to true to allow Route 53 to check the health of the target
+  }
+}
+
