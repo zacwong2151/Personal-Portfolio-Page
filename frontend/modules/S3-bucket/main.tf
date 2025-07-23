@@ -40,11 +40,38 @@ resource "aws_s3_bucket_public_access_block" "public_access_config" {
 # Create bucket policy
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
+    sid = "Only allow your CloudFront distribution to access this bucket"
+
     effect = "Allow"
 
     principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.static_website_bucket.arn}/*", # Apply to all objects in the bucket
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [var.cloudfront_arn]
+    }
+  }
+
+  statement {
+    sid = "Explicitly deny public access to S3"
+
+    effect = "Deny"
+
+    principals {
       type        = "*"
-      identifiers = ["*"] # Allows access to all principals (public)
+      identifiers = ["*"]
     }
 
     actions = [
@@ -54,6 +81,13 @@ data "aws_iam_policy_document" "bucket_policy" {
     resources = [
       "${aws_s3_bucket.static_website_bucket.arn}/*",
     ]
+
+    # This condition ensures the denial applies to requests NOT coming from your CloudFront distribution
+    condition {
+      test     = "StringNotEquals"
+      variable = "AWS:SourceArn"
+      values   = [var.cloudfront_arn]
+    }
   }
 }
 

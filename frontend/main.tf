@@ -7,7 +7,8 @@ provider "aws" {
 module "S3_static_website_bucket" {
   source = "./modules/S3-bucket"
 
-  bucket_name = var.bucket_name
+  bucket_name    = var.bucket_name
+  cloudfront_arn = module.CloudFront.cloudfront_arn
 }
 
 module "ACM" {
