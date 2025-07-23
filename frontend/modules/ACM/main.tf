@@ -1,7 +1,7 @@
 # Requests a certicate from ACM
 resource "aws_acm_certificate" "acm_cert" {
-    domain_name = var.website_domain_name 
-    validation_method = "DNS"
+  domain_name       = var.website_domain_name
+  validation_method = "DNS"
 }
 
 # Retrieve the Hosted Zone ID for your 'loonymoony.click' domain
@@ -34,7 +34,7 @@ resource "aws_route53_record" "route53_records" {
 
 # This resource represents a successful validation of an ACM certificate
 resource "aws_acm_certificate_validation" "acm_cert_validation" {
-  certificate_arn         = aws_acm_certificate.acm_cert.arn
+  certificate_arn = aws_acm_certificate.acm_cert.arn
 
   /*
     This is the key for validation. It waits for the CNAME records created by aws_route53_record to propagate and for ACM to
