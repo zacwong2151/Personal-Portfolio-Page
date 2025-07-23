@@ -4,138 +4,15 @@ provider "aws" {
   region  = "us-east-1" # Explicitly define the region, even if in profile, for clarity.
 }
 
-# Create bucket
-resource "aws_s3_bucket" "static_website_bucket" {
-  bucket = var.bucket_name
+module "S3_static_website_bucket" {
+    source = "./modules/S3-bucket"
 
-  tags = {
-    Project = "TerraformStaticWebsite"
-  }
+    bucket_name = var.bucket_name
 }
 
-# Enable static website hosting
-resource "aws_s3_bucket_website_configuration" "static_website_config" {
-  bucket = aws_s3_bucket.static_website_bucket.id
+module "Route53" {
+    source = "./modules/Route53"
 
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    key = "error.html"
-  }
-
-  routing_rules = jsonencode([
-    {
-      Condition = {
-        HttpErrorCodeReturnedEquals = "404"
-      }
-      Redirect = {
-        ReplaceKeyWith = "error.html"
-      }
-    }
-  ])
+    website_domain_name = var.website_domain_name
+    S3_website_domain_name = module.S3_static_website_bucket.S3_website_domain_name 
 }
-
-# Allow public access to bucket
-resource "aws_s3_bucket_public_access_block" "example" {
-  bucket = aws_s3_bucket.static_website_bucket.id
-
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
-}
-
-# Create bucket policy
-data "aws_iam_policy_document" "static_website_policy" {
-  statement {
-    effect = "Allow"
-
-    principals {
-      type        = "*"
-      identifiers = ["*"] # Allows access to all principals (public)
-    }
-
-    actions = [
-      "s3:GetObject",
-    ]
-
-    resources = [
-      "${aws_s3_bucket.static_website_bucket.arn}/*",
-    ]
-  }
-}
-
-# Attach the bucket policy to the bucket
-resource "aws_s3_bucket_policy" "static_website_bucket_policy" {
-  bucket = aws_s3_bucket.static_website_bucket.id
-  policy = data.aws_iam_policy_document.static_website_policy.json
-}
-
-# Upload files to the S3 bucket
-resource "aws_s3_object" "index_html" {
-  bucket       = aws_s3_bucket.static_website_bucket.id
-  key          = "index.html"
-  source       = "index.html" # Path to your local index.html file
-  content_type = "text/html"
-  etag         = filemd5("index.html") # Forces recreation if file content changes
-
-  # Explicit dependency to ensure bucket is ready before uploading
-  depends_on = [
-    aws_s3_bucket_website_configuration.static_website_config,
-    aws_s3_bucket_policy.static_website_bucket_policy,
-    aws_s3_bucket_public_access_block.example
-  ]
-}
-
-resource "aws_s3_object" "error_html" {
-  bucket       = aws_s3_bucket.static_website_bucket.id
-  key          = "error.html"
-  source       = "error.html" # Path to your local error.html file
-  content_type = "text/html"
-  etag         = filemd5("error.html") # Forces recreation if file content changes
-
-  depends_on = [
-    aws_s3_bucket_website_configuration.static_website_config,
-    aws_s3_bucket_policy.static_website_bucket_policy,
-    aws_s3_bucket_public_access_block.example
-  ]
-}
-
-resource "aws_s3_object" "style_css" {
-  bucket       = aws_s3_bucket.static_website_bucket.id
-  key          = "style.css"
-  source       = "style.css" # Path to your local style.css file
-  content_type = "text/css"
-  etag         = filemd5("style.css") # Forces recreation if file content changes
-
-  depends_on = [
-    aws_s3_bucket_website_configuration.static_website_config,
-    aws_s3_bucket_policy.static_website_bucket_policy,
-    aws_s3_bucket_public_access_block.example
-  ]
-}
-
-# --- Route 53 Configuration ---
-
-# Retrieve the Hosted Zone ID for your 'loonymoony.click' domain
-data "aws_route53_zone" "selected_zone" {
-  name         = "loonymoony.click."
-  private_zone = false               
-}
-
-# Create the A record for the root domain 'loonymoony.click'
-resource "aws_route53_record" "www_alias" {
-  zone_id = data.aws_route53_zone.selected_zone.zone_id
-  name    = "loonymoony.click" # The root domain
-  type    = "A"
-
-  # Alias record configuration
-  alias {
-    name = aws_s3_bucket_website_configuration.static_website_config.website_domain
-    zone_id = var.hosted_zone_id_us-east-1
-    evaluate_target_health = true # Set to true to allow Route 53 to check the health of the target
-  }
-}
-
