@@ -13,6 +13,12 @@ module "S3_static_website_bucket" {
 module "Route53" {
     source = "./modules/Route53"
 
-    website_domain_name = var.website_domain_name
-    S3_website_domain_name = module.S3_static_website_bucket.S3_website_domain_name 
+    website_domain_name = var.website_domain_name 
+    S3_website_domain_name = module.S3_static_website_bucket.S3_website_domain_name # s3-website-us-east-1.amazonaws.com
+}
+
+module "ACM" {
+    source = "./modules/ACM"
+
+    website_domain_name = var.website_domain_name 
 }
