@@ -6,11 +6,11 @@ resource "aws_dynamodb_table" "visitor_count_table" {
      partition and sort key
   */
   attribute {
-    name = "Count"
+    name = "id"
     type = "S" # Data type for the partition key. Could be 'S' for string, 'N' for number, or 'B' for binary
   }
 
-  hash_key = "Count"
+  hash_key = "id"
 
   # Billing mode for the table.
   # "PROVISIONED" allows you to specify read and write capacity units,

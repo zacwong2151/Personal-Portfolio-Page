@@ -60,3 +60,6 @@ terraform.rc
 # Editor backup files (e.g., from vim, emacs)
 *~              # Vim backup files
 \#*#            # Emacs backup files
+
+node_modules
+*.zip

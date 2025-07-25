@@ -9,3 +9,9 @@ module "DynamoDB" {
 
   dynamodb_table_name = var.dynamodb_table_name
 }
+
+module "Lambda" {
+  source = "./modules/Lambda"
+
+  dynamodb_table_arn = module.DynamoDB.dynamodb_table_arn
+}
