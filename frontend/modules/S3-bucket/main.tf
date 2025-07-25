@@ -10,21 +10,6 @@ resource "aws_s3_bucket_website_configuration" "static_website_config" {
   index_document {
     suffix = "index.html"
   }
-
-  error_document {
-    key = "error.html"
-  }
-
-  routing_rules = jsonencode([
-    {
-      Condition = {
-        HttpErrorCodeReturnedEquals = "404"
-      }
-      Redirect = {
-        ReplaceKeyWith = "error.html"
-      }
-    }
-  ])
 }
 
 # Allow public access to bucket
@@ -40,13 +25,13 @@ resource "aws_s3_bucket_public_access_block" "public_access_config" {
 # Create bucket policy
 data "aws_iam_policy_document" "bucket_policy" {
   statement {
-    sid = "Only allow your CloudFront distribution to access this bucket"
+    sid = "AllowPublicAccessWithCustomHeader"
 
     effect = "Allow"
 
     principals {
-      type        = "Service"
-      identifiers = ["cloudfront.amazonaws.com"]
+      type        = "*"
+      identifiers = ["*"]
     }
 
     actions = [
@@ -59,35 +44,32 @@ data "aws_iam_policy_document" "bucket_policy" {
 
     condition {
       test     = "StringEquals"
-      variable = "AWS:SourceArn"
-      values   = [var.cloudfront_arn]
+      variable = "aws:Referer" # This checks the Referer header
+      values   = [var.cloudfront_custom_header]
     }
   }
 
   statement {
-    sid = "Explicitly deny public access to S3"
+    sid = "AllowAwsAccountAccess"
 
-    effect = "Deny"
+    effect = "Allow"
 
     principals {
-      type        = "*"
-      identifiers = ["*"]
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::852359052829:user/admin"] # Allows the admin IAM user of your AWS account
     }
 
     actions = [
       "s3:GetObject",
+      "s3:ListBucket",
+      "s3:PutObject",
+      "s3:DeleteObject"
     ]
 
     resources = [
-      "${aws_s3_bucket.static_website_bucket.arn}/*",
+      aws_s3_bucket.static_website_bucket.arn,        # for bucket-level actions (e.g. ListBucket)
+      "${aws_s3_bucket.static_website_bucket.arn}/*", # for object-level actions
     ]
-
-    # This condition ensures the denial applies to requests NOT coming from your CloudFront distribution
-    condition {
-      test     = "StringNotEquals"
-      variable = "AWS:SourceArn"
-      values   = [var.cloudfront_arn]
-    }
   }
 }
 
@@ -109,7 +91,7 @@ resource "aws_s3_object" "index_html" {
   depends_on = [
     aws_s3_bucket_website_configuration.static_website_config,
     aws_s3_bucket_policy.attach_bucket_policy,
-    aws_s3_bucket_public_access_block.public_access_config
+    # aws_s3_bucket_public_access_block.public_access_config
   ]
 }
 
@@ -123,7 +105,6 @@ resource "aws_s3_object" "error_html" {
   depends_on = [
     aws_s3_bucket_website_configuration.static_website_config,
     aws_s3_bucket_policy.attach_bucket_policy,
-    aws_s3_bucket_public_access_block.public_access_config
   ]
 }
 
@@ -137,6 +118,18 @@ resource "aws_s3_object" "style_css" {
   depends_on = [
     aws_s3_bucket_website_configuration.static_website_config,
     aws_s3_bucket_policy.attach_bucket_policy,
-    aws_s3_bucket_public_access_block.public_access_config
+  ]
+}
+
+resource "aws_s3_object" "koala_pic" {
+  bucket       = aws_s3_bucket.static_website_bucket.id
+  key          = "koala.jpg"
+  source       = "${path.module}/web-files/koala.jpg"
+  content_type = "image/jpeg"
+  etag         = filemd5("${path.module}/web-files/koala.jpg") # Triggers update if file content changes
+
+  depends_on = [
+    aws_s3_bucket_website_configuration.static_website_config,
+    aws_s3_bucket_policy.attach_bucket_policy,
   ]
 }

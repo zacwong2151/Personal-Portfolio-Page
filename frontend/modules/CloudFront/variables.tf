@@ -16,3 +16,8 @@ variable "acm_cert_arn" {
   description = "The ARN of the validated ACM certificate for your custom domain."
   type        = string
 }
+
+variable "cloudfront_custom_header" {
+  description = "Custom header value that is passed to S3 origin"
+  type        = string
+}

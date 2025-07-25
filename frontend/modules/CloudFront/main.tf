@@ -10,10 +10,15 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
     # Since S3 static website hosting behaves as a custom origin, you need custom origin configuration
     custom_origin_config {
       http_port  = 80  # HTTP port the custom origin listens on.
-      https_port = 443 #HTTPS port the custom origin listens on.
+      https_port = 443 # HTTPS port the custom origin listens on.
 
       origin_protocol_policy = "http-only" # CloudFront will use HTTP to communicate with the S3 static website endpoint. Cannot be changed for custom origins.
       origin_ssl_protocols   = ["TLSv1.2"]
+    }
+
+    custom_header {
+      name  = "Referer"
+      value = var.cloudfront_custom_header
     }
   }
 
@@ -67,4 +72,12 @@ resource "aws_cloudfront_distribution" "cf_distribution" {
 
   # The default object that CloudFront returns when a viewer requests the root URL.
   default_root_object = "index.html"
+
+  # Custom error response to redirect 404s to error.html
+  custom_error_response {
+    error_code            = 404
+    response_page_path    = "/error.html"
+    response_code         = 200
+    error_caching_min_ttl = 0 # Optional: How long CloudFront should cache the error response. For SPAs, a low TTL (e.g., 0) is often preferred to ensure client-side routing works.
+  }
 }

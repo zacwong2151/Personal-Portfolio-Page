@@ -4,11 +4,21 @@ provider "aws" {
   region  = "us-east-1" # Explicitly define the region, even if in profile, for clarity.
 }
 
+# Generates a random string to use as a secret header value for S3 origin access
+resource "random_string" "origin_access_header_value" {
+  length  = 32
+  special = false
+  upper   = true
+  lower   = true
+  numeric = true
+}
+
 module "S3_static_website_bucket" {
   source = "./modules/S3-bucket"
 
-  bucket_name    = var.bucket_name
-  cloudfront_arn = module.CloudFront.cloudfront_arn
+  bucket_name              = var.bucket_name
+  cloudfront_arn           = module.CloudFront.cloudfront_arn
+  cloudfront_custom_header = random_string.origin_access_header_value.result
 }
 
 module "ACM" {
@@ -23,8 +33,9 @@ module "CloudFront" {
   website_domain_name = var.website_domain_name
   bucket_name         = var.bucket_name
 
-  S3_website_endpoint = module.S3_static_website_bucket.S3_website_endpoint
-  acm_cert_arn        = module.ACM.acm_cert_arn
+  S3_website_endpoint      = module.S3_static_website_bucket.S3_website_endpoint
+  acm_cert_arn             = module.ACM.acm_cert_arn
+  cloudfront_custom_header = random_string.origin_access_header_value.result
 }
 
 module "Route53" {

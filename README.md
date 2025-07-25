@@ -28,3 +28,12 @@
 1. Deploy a CloudFront distribution and associate the SSL cert to enable HTTPS access
 2. Create a Route 53 'A' record with Alias to the distribution (the record in step 3 is no longer needed)
 3. Modify the bucket policy to only allow access from this specific distribution
+
+## 5.1 Consideration when choosing S3 origin or custom origin
+| | S3 origin | Custom origin |
+| -------- | -------- | ------- |
+| Public access settings | Private bucket | Public bucket |
+| How to enforce request only via CloudFront | Force all traffic through CloudFront via OAC | Bucket only accepts requests with custom secret headers which are sent from CloudFront |
+| Bucket policy | Only accept requests from the CloudFront distribution ARN | Accepts requests from all principals |
+| Invalid object request | May need to write a CloudFront function to route requests for non-existent objects to `error.html` | Comes with native support with routing to default objects |
+

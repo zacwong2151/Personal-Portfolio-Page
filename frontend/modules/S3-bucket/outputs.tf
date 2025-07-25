@@ -7,3 +7,8 @@ output "S3_website_endpoint" { # http://loonymoony.click.s3-website-us-east-1.am
   description = "Domain name is the human-readable address, while endpoint URL is the full path that includes the protocol, domain name, and path"
   value       = aws_s3_bucket_website_configuration.static_website_config.website_endpoint
 }
+
+output "S3_bucket_arn" {
+  description = "ARN of the S3 bucket"
+  value       = aws_s3_bucket.static_website_bucket.arn
+}
