@@ -72,18 +72,20 @@ export const handler = async (event, context) => {
             Key: {
                 ipAddress: clientIp,
             },
-            UpdateExpression: "SET #ts = :newTimestamp, #ttl = :newTTL, #tsDateTime = :newTimestampDateTime, #ttlDateTime = :newTTLDateTime",
+            UpdateExpression: "SET #ts = :newTimestamp, #ttl = :newTTL, #tsDateTime = :newTimestampDateTime, #ttlDateTime = :newTTLDateTime, #noOfVisits = #noOfVisits + :inc",
             ExpressionAttributeNames: {
                 "#ts": "timestamp",
                 "#ttl": "ttl",
                 "#tsDateTime": "timestampDateTime",
                 "#ttlDateTime": "ttlDateTime",
+                "#noOfVisits": "noOfVisits",
             },
             ExpressionAttributeValues: {
                 ":newTimestamp": currentTimeMs,
                 ":newTTL": ttlExpirationTimeSeconds,
                 ":newTimestampDateTime": convertTimestampToReadableDateTime(currentTimeMs),
-                ":newTTLDateTime": convertTimestampToReadableDateTime(ttlExpirationTimeSeconds * 1000)
+                ":newTTLDateTime": convertTimestampToReadableDateTime(ttlExpirationTimeSeconds * 1000),
+                ":inc": 1
             },
             ReturnValues: "UPDATED_NEW"
         };
@@ -96,9 +98,10 @@ export const handler = async (event, context) => {
             TableName: UNIQUE_VISITORS_TABLE_NAME,
             Item: {
                 ipAddress: clientIp,
+                noOfVisits: 1,
                 timestampMs: currentTimeMs, // in milliseconds since epoch 
                 timestampDateTime: convertTimestampToReadableDateTime(currentTimeMs),
-                ttlSeconds: ttlExpirationTimeSeconds, // in seconds since epoch
+                ttl: ttlExpirationTimeSeconds, // in seconds since epoch
                 ttlDateTime: convertTimestampToReadableDateTime(ttlExpirationTimeSeconds * 1000)
             }
         }

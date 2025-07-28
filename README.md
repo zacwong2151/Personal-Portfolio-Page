@@ -71,3 +71,5 @@
 | Cache | No built-in caching | Built-in caching at the API Gateway level to reduce load on backend and improve latency |
 | Auth options | Supports JWT auth (for OAuth), IAM auth, basic Lambda auth | Supports a broader range of auth mechanisms, including IAM auth, Cognito User Pools auth, custom Lambda auth, API keys |
 | Private APIs | No direct support for private API endpoints (you'd need a private ALB) | Can create private endpoints accessible only from within your VPC using VPC Endpoints |
+
+## 9. Display visitor count in frontend
