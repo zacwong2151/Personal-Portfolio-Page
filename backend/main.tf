@@ -15,3 +15,10 @@ module "Lambda" {
 
   dynamodb_table_arn = module.DynamoDB.dynamodb_table_arn
 }
+
+module "API-Gateway" {
+  source = "./modules/API-Gateway"
+
+  website_domain_name = var.website_domain_name
+  lambda_function_arn = module.Lambda.lambda_function_arn
+}
