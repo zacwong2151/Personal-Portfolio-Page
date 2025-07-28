@@ -62,7 +62,7 @@ data "archive_file" "lambda_code" {
   type        = "zip" # generates a zip file
   source_dir  = "${path.module}/lambda"
   output_path = "${path.module}/lambda/function.zip"
-  excludes = [ # only zips the /node_modules folder, index.js, and package.json
+  excludes = [ # only zips the /node_modules folder, index.js, util.js, and package.json
     "*.zip",
     "package-lock.json"
   ]

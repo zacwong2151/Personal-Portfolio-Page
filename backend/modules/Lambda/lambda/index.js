@@ -1,5 +1,6 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
 import { DynamoDBDocumentClient, UpdateCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb"
+import { convertTimestampToReadableDateTime } from "./util.js"
 
 const client = new DynamoDBClient({
     region: "us-east-1",
@@ -24,7 +25,7 @@ export const handler = async (event, context) => {
     console.log(`Received request from IP: ${clientIp}`);
 
     const currentTimeMs = Date.now() // in milliseconds
-    const ttlExpirationTimeSeconds = Math.floor((currentTimeMs + UNIQUE_VISIT_WINDOW_HOURS * 60 * 60 * 1000)) / 1000 // in seconds
+    const ttlExpirationTimeSeconds = Math.floor((currentTimeMs + UNIQUE_VISIT_WINDOW_HOURS * 60 * 60 * 1000) / 1000) // in seconds
 
     const getVisitorCount = async () => {
         const getVisitorCountParams = {
@@ -71,14 +72,18 @@ export const handler = async (event, context) => {
             Key: {
                 ipAddress: clientIp,
             },
-            UpdateExpression: "SET #ts = :newTimestamp, #ttl = :newTTL",
+            UpdateExpression: "SET #ts = :newTimestamp, #ttl = :newTTL, #tsDateTime = :newTimestampDateTime, #ttlDateTime = :newTTLDateTime",
             ExpressionAttributeNames: {
                 "#ts": "timestamp",
-                "#ttl": "ttl"
+                "#ttl": "ttl",
+                "#tsDateTime": "timestampDateTime",
+                "#ttlDateTime": "ttlDateTime",
             },
             ExpressionAttributeValues: {
                 ":newTimestamp": currentTimeMs,
                 ":newTTL": ttlExpirationTimeSeconds,
+                ":newTimestampDateTime": convertTimestampToReadableDateTime(currentTimeMs),
+                ":newTTLDateTime": convertTimestampToReadableDateTime(ttlExpirationTimeSeconds * 1000)
             },
             ReturnValues: "UPDATED_NEW"
         };
@@ -91,8 +96,10 @@ export const handler = async (event, context) => {
             TableName: UNIQUE_VISITORS_TABLE_NAME,
             Item: {
                 ipAddress: clientIp,
-                timestamp: currentTimeMs, // in milliseconds since epoch 
-                ttl: ttlExpirationTimeSeconds // in seconds since epoch
+                timestampMs: currentTimeMs, // in milliseconds since epoch 
+                timestampDateTime: convertTimestampToReadableDateTime(currentTimeMs),
+                ttlSeconds: ttlExpirationTimeSeconds, // in seconds since epoch
+                ttlDateTime: convertTimestampToReadableDateTime(ttlExpirationTimeSeconds * 1000)
             }
         }
         await docClient.send(new PutCommand(insertUniqueVisitorParams))
