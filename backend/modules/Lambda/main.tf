@@ -24,8 +24,12 @@ resource "aws_iam_policy" "lambda_permissions_policy" {
         Action = [
           "dynamodb:UpdateItem",
           "dynamodb:GetItem",
+          "dynamodb:PutItem",
         ]
-        Resource = var.dynamodb_table_arn
+        Resource = [
+          var.visitor_count_table_arn,
+          var.unique_visitors_table_arn
+        ]
       },
       {
         Effect = "Allow"

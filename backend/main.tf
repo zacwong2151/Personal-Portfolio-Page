@@ -6,14 +6,13 @@ provider "aws" {
 
 module "DynamoDB" {
   source = "./modules/DynamoDB"
-
-  dynamodb_table_name = var.dynamodb_table_name
 }
 
 module "Lambda" {
   source = "./modules/Lambda"
 
-  dynamodb_table_arn = module.DynamoDB.dynamodb_table_arn
+  visitor_count_table_arn   = module.DynamoDB.visitor_count_table_arn
+  unique_visitors_table_arn = module.DynamoDB.unique_visitors_table_arn
 }
 
 module "API-Gateway" {

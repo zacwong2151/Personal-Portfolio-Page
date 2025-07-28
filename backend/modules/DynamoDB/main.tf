@@ -1,5 +1,5 @@
 resource "aws_dynamodb_table" "visitor_count_table" {
-  name = var.dynamodb_table_name
+  name = var.visitor_count_table_name
 
   /*
     The attribute block tells DynamoDB which attributes will form your table's and Global Secondary Index's (if applicable)
@@ -30,3 +30,23 @@ resource "aws_dynamodb_table" "visitor_count_table" {
   # stream_enabled   = true
 }
 
+resource "aws_dynamodb_table" "unique_visitors_table" {
+  name = var.unique_visitors_table_name
+
+  attribute {
+    name = "ipAddress"
+    type = "S"
+  }
+
+  hash_key = "ipAddress"
+
+  billing_mode   = "PROVISIONED"
+  read_capacity  = 1
+  write_capacity = 1
+
+  # Enable TTL for automatic cleanup of old IP records.
+  ttl {
+    attribute_name = "ttl" # The attribute in your item that stores the Unix timestamp for expiration
+    enabled        = true
+  }
+}

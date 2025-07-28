@@ -25,10 +25,10 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   timeout_milliseconds   = 30000                   # Max 30 seconds for HTTP APIs
 }
 
-# 3. Define the Route: PUT /increment-visitor-count
+# 3. Define the Route: POST /visitor-count
 resource "aws_apigatewayv2_route" "increment_visitor_count_route" {
   api_id    = aws_apigatewayv2_api.http_api.id
-  route_key = "PUT /increment-visitor-count" # Define the HTTP method and path
+  route_key = "POST /visitor-count" # Define the HTTP method and path
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
