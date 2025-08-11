@@ -1,0 +1,41 @@
+# Workflow: whenever there is a push to the master branch, and either the code in /frontend or /infrastructure/frontend changes, 
+ # terraform init and terraform apply is ran on the infrastruture/frontend folder, which will reupload objects to the 
+  # S3 bucket (if objects were modified)
+
+name: Deploy Frontend to S3
+
+on:
+  push:
+    branches:
+      - master  # Or `main`, depending on your branch name
+    paths:
+      - 'frontend/**'  # Trigger only when files in the frontend folder change
+      - 'infrastructure/frontend/**' # Also trigger if IaC for frontend changes
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code # This action checks out your repository's code so the runner can access your files.
+        uses: actions/checkout@v3
+
+      - name: Set up Terraform # This is a pre-built action from HashiCorp that installs a specific version of Terraform on the runner.
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0 # Or the version you are using
+
+      - name: Configure AWS Credentials # This is an official AWS action that configures your AWS credentials as environment variables on the runner using the secrets you stored in GitHub.
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1 # Change to your AWS region
+
+      - name: Terraform Init # This step runs terraform init
+        run: terraform init -backend-config="key=infrastructure/frontend"
+        working-directory: ./infrastructure/frontend
+
+      - name: Terraform Apply # This step runs terraform apply. The -auto-approve flag is used for CI/CD environments to automatically apply changes without requiring manual confirmation
+        run: terraform apply -auto-approve
+        working-directory: ./infrastructure/frontend
