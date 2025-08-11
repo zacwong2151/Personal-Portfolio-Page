@@ -1,6 +1,6 @@
 # Create bucket
 resource "aws_s3_bucket" "static_website_bucket" {
-  bucket = var.bucket_name
+  bucket = var.website_bucket_name
 }
 
 # Enable static website hosting
@@ -132,4 +132,17 @@ resource "aws_s3_object" "koala_pic" {
     aws_s3_bucket_website_configuration.static_website_config,
     aws_s3_bucket_policy.attach_bucket_policy,
   ]
+}
+
+# Another S3 bucket to store frontend infra terraform state file, so that your local machine and the GitHub Actions runner reads the same terraform.tfstate file
+resource "aws_s3_bucket" "terraform_state_bucket" {
+  bucket = var.terraform_state_bucket_name
+}
+
+# Enable versioning so that you can recover previous versions of your state file in case of accidental corruption or deletion
+resource "aws_s3_bucket_versioning" "versioning" {
+  bucket = aws_s3_bucket.terraform_state_bucket.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }

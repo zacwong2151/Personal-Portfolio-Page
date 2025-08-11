@@ -1,16 +1,16 @@
 output "S3_website_domain_name" {
   description = "The S3 static website domain name."
-  value       = module.S3_static_website_bucket.S3_website_domain_name
+  value       = module.S3_buckets.S3_website_domain_name
 }
 
 output "S3_website_endpoint" {
   description = "The S3 static website endpoint URL. Comprises of the protocol, domain name, and path"
-  value       = module.S3_static_website_bucket.S3_website_endpoint
+  value       = module.S3_buckets.S3_website_endpoint
 }
 
-output "S3_bucket_arn" {
-  description = "ARN of the S3 bucket"
-  value       = module.S3_static_website_bucket.S3_bucket_arn
+output "S3_website_bucket_arn" {
+  description = "ARN of the S3 website bucket"
+  value       = module.S3_buckets.S3_website_bucket_arn
 }
 
 output "cloudfront_arn" {

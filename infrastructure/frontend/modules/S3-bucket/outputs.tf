@@ -8,7 +8,7 @@ output "S3_website_endpoint" { # http://loonymoony.click.s3-website-us-east-1.am
   value       = aws_s3_bucket_website_configuration.static_website_config.website_endpoint
 }
 
-output "S3_bucket_arn" {
+output "S3_website_bucket_arn" {
   description = "ARN of the S3 bucket"
   value       = aws_s3_bucket.static_website_bucket.arn
 }

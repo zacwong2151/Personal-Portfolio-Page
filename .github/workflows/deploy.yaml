@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout code # This action checks out your repository's code so the runner can access your files.
+      - name: Checkout code # pulls your entire repository onto the runner
         uses: actions/checkout@v3
 
       - name: Set up Terraform # This is a pre-built action from HashiCorp that installs a specific version of Terraform on the runner.
@@ -32,10 +32,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1 # Change to your AWS region
 
-      - name: Terraform Init # This step runs terraform init
-        run: terraform init -backend-config="key=infrastructure/frontend"
-        working-directory: ./infrastructure/frontend
+      - name: Terraform Init 
+        run: terraform init # reads your main.tf file, finds the backend "s3" block, and automatically connects to the S3 bucket and key you have defined there
+        working-directory: ./infrastructure/frontend # changes the working directory to where your Terraform code is located
 
-      - name: Terraform Apply # This step runs terraform apply. The -auto-approve flag is used for CI/CD environments to automatically apply changes without requiring manual confirmation
-        run: terraform apply -auto-approve
+      - name: Terraform Apply 
+        run: terraform apply -auto-approve # the -auto-approve flag is used for CI/CD environments to automatically apply changes without requiring manual confirmation
         working-directory: ./infrastructure/frontend
