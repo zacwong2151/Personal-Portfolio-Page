@@ -17,6 +17,7 @@ module "S3_static_website_bucket" {
   source = "./modules/S3-bucket"
 
   bucket_name              = var.bucket_name
+  web_files_path = "../../frontend"
   cloudfront_arn           = module.CloudFront.cloudfront_arn
   cloudfront_custom_header = random_string.origin_access_header_value.result
 }

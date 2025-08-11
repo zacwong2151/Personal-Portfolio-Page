@@ -79,13 +79,13 @@ resource "aws_s3_bucket_policy" "attach_bucket_policy" {
   policy = data.aws_iam_policy_document.bucket_policy.json
 }
 
-# Upload files to the S3 bucket. By using ${path.module}, you explicitly tell Terraform to look for the file relative to the S3-bucket directory
+# Upload files to the S3 bucket
 resource "aws_s3_object" "index_html" {
   bucket       = aws_s3_bucket.static_website_bucket.id
   key          = "index.html"
-  source       = "${path.module}/web-files/index.html"
+  source       = "${var.web_files_path}/index.html"
   content_type = "text/html"
-  etag         = filemd5("${path.module}/web-files/index.html") # Triggers update if file content changes
+  etag         = filemd5("${var.web_files_path}/index.html") # Triggers update if file content changes
 
   # Explicit dependency to ensure bucket is ready before uploading
   depends_on = [
@@ -98,9 +98,9 @@ resource "aws_s3_object" "index_html" {
 resource "aws_s3_object" "error_html" {
   bucket       = aws_s3_bucket.static_website_bucket.id
   key          = "error.html"
-  source       = "${path.module}/web-files/error.html"
+  source       = "${var.web_files_path}/error.html"
   content_type = "text/html"
-  etag         = filemd5("${path.module}/web-files/error.html") # Triggers update if file content changes
+  etag         = filemd5("${var.web_files_path}/error.html") # Triggers update if file content changes
 
   depends_on = [
     aws_s3_bucket_website_configuration.static_website_config,
@@ -111,9 +111,9 @@ resource "aws_s3_object" "error_html" {
 resource "aws_s3_object" "style_css" {
   bucket       = aws_s3_bucket.static_website_bucket.id
   key          = "style.css"
-  source       = "${path.module}/web-files/style.css"
+  source       = "${var.web_files_path}/style.css"
   content_type = "text/css"
-  etag         = filemd5("${path.module}/web-files/style.css") # Triggers update if file content changes
+  etag         = filemd5("${var.web_files_path}/style.css") # Triggers update if file content changes
 
   depends_on = [
     aws_s3_bucket_website_configuration.static_website_config,
@@ -124,9 +124,9 @@ resource "aws_s3_object" "style_css" {
 resource "aws_s3_object" "koala_pic" {
   bucket       = aws_s3_bucket.static_website_bucket.id
   key          = "koala.jpg"
-  source       = "${path.module}/web-files/koala.jpg"
+  source       = "${var.web_files_path}/koala.jpg"
   content_type = "image/jpeg"
-  etag         = filemd5("${path.module}/web-files/koala.jpg") # Triggers update if file content changes
+  etag         = filemd5("${var.web_files_path}/koala.jpg") # Triggers update if file content changes
 
   depends_on = [
     aws_s3_bucket_website_configuration.static_website_config,

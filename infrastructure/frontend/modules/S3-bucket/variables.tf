@@ -12,3 +12,8 @@ variable "cloudfront_custom_header" {
   description = "Custom header value that received from a CloudFront request"
   type        = string
 }
+
+variable "web_files_path" {
+  description = "The absolute or relative path to the directory containing the web files to upload."
+  type        = string
+}
