@@ -74,7 +74,7 @@ export const handler = async (event, context) => {
             },
             UpdateExpression: "SET #ts = :newTimestamp, #ttl = :newTTL, #tsDateTime = :newTimestampDateTime, #ttlDateTime = :newTTLDateTime, #noOfVisits = #noOfVisits + :inc",
             ExpressionAttributeNames: {
-                "#ts": "timestamp",
+                "#ts": "timestampMs",
                 "#ttl": "ttl",
                 "#tsDateTime": "timestampDateTime",
                 "#ttlDateTime": "ttlDateTime",
