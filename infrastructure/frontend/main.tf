@@ -1,6 +1,6 @@
 # Configure the AWS Provider
 provider "aws" {
-  profile = "admin-zac-development"
+#   profile = "admin-zac-development" # Removed so that this AWS provider block is agnostic to the credential source (which could be your local CLI, or the Github Actions runner)
   region  = "us-east-1" # Explicitly define the region, even if in profile, for clarity.
 }
 

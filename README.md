@@ -73,3 +73,9 @@
 | Private APIs | No direct support for private API endpoints (you'd need a private ALB) | Can create private endpoints accessible only from within your VPC using VPC Endpoints |
 
 ## 9. Display visitor count in frontend
+
+## 10. Set up a workflow in Github Actions
+1. This workflow will automatically upload your frontend code to your S3 bucket whenever you change the frontend code and push it to the master branch
+2. The Github Actions runner will use environment variables stored in Github's `Repository secrets` for authentication with AWS
+    - For this to work, you will need to remove the explicit declaration of your named profile in the AWS provider block -> `profile = "admin-zac-development"`
+    - Before running any terraform commands, set an environment variable in your terminal -> `export AWS_PROFILE="admin-zac-development"`. This tells terraform to use this named profile for authentication with AWS
