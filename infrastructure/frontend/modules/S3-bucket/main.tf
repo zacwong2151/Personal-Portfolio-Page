@@ -79,55 +79,37 @@ resource "aws_s3_bucket_policy" "attach_bucket_policy" {
   policy = data.aws_iam_policy_document.bucket_policy.json
 }
 
-# Upload files to the S3 bucket
-resource "aws_s3_object" "index_html" {
-  bucket       = aws_s3_bucket.static_website_bucket.id
-  key          = "index.html"
-  source       = "${var.web_files_path}/index.html"
-  content_type = "text/html"
-  etag         = filemd5("${var.web_files_path}/index.html") # Triggers update if file content changes
+# Upload the entire contents of the 'dist' folder to the S3 bucket
+# This dynamically creates an aws_s3_object for every file and subdirectory within your dist folder
+resource "aws_s3_object" "website_files" {
+  for_each = fileset("${var.web_files_path}", "**")
 
-  # Explicit dependency to ensure bucket is ready before uploading
-  depends_on = [
-    aws_s3_bucket_website_configuration.static_website_config,
-    aws_s3_bucket_policy.attach_bucket_policy,
-    # aws_s3_bucket_public_access_block.public_access_config
-  ]
-}
+  bucket = aws_s3_bucket.static_website_bucket.id
+  key    = each.value
+  source = "${var.web_files_path}/${each.value}"
 
-resource "aws_s3_object" "error_html" {
-  bucket       = aws_s3_bucket.static_website_bucket.id
-  key          = "error.html"
-  source       = "${var.web_files_path}/error.html"
-  content_type = "text/html"
-  etag         = filemd5("${var.web_files_path}/error.html") # Triggers update if file content changes
-
-  depends_on = [
-    aws_s3_bucket_website_configuration.static_website_config,
-    aws_s3_bucket_policy.attach_bucket_policy,
-  ]
-}
-
-resource "aws_s3_object" "style_css" {
-  bucket       = aws_s3_bucket.static_website_bucket.id
-  key          = "style.css"
-  source       = "${var.web_files_path}/style.css"
-  content_type = "text/css"
-  etag         = filemd5("${var.web_files_path}/style.css") # Triggers update if file content changes
-
-  depends_on = [
-    aws_s3_bucket_website_configuration.static_website_config,
-    aws_s3_bucket_policy.attach_bucket_policy,
-  ]
-}
-
-resource "aws_s3_object" "koala_pic" {
-  bucket       = aws_s3_bucket.static_website_bucket.id
-  key          = "koala.jpg"
-  source       = "${var.web_files_path}/koala.jpg"
-  content_type = "image/jpeg"
-  etag         = filemd5("${var.web_files_path}/koala.jpg") # Triggers update if file content changes
-
+  # Set the content type based on the file extension
+  content_type = try(
+    lookup({
+      "html"  = "text/html",
+      "css"   = "text/css",
+      "js"    = "application/javascript",
+      "json"  = "application/json",
+      "png"   = "image/png",
+      "jpg"   = "image/jpeg",
+      "jpeg"  = "image/jpeg",
+      "gif"   = "image/gif",
+      "svg"   = "image/svg+xml",
+      "ico"   = "image/x-icon",
+      "woff"  = "font/woff",
+      "woff2" = "font/woff2",
+      "ttf"   = "font/ttf",
+      "eot"   = "application/vnd.ms-fontobject",
+      "otf"   = "font/otf"
+    }, split(".", each.value)[length(split(".", each.value)) - 1], "application/octet-stream"),
+    "application/octet-stream"
+  )
+  etag = filemd5("${var.web_files_path}/${each.value}")
   depends_on = [
     aws_s3_bucket_website_configuration.static_website_config,
     aws_s3_bucket_policy.attach_bucket_policy,

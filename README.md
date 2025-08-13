@@ -79,3 +79,8 @@
 2. The Github Actions runner will use environment variables stored in Github's `Repository secrets` for authentication with AWS
     - For this to work, you will need to remove the explicit declaration of your named profile in the AWS provider block -> `profile = "admin-zac-development"`
     - Before running any terraform commands, set an environment variable in your terminal -> `export AWS_PROFILE="admin-zac-development"`. This tells terraform to use this named profile for authentication with AWS
+3. In order to access the same terraform.tfstate file no matter where you run `terraform apply` from (e.g. from your local machine or through GitHub actions runner), you should create a new S3 bucket and store the state file there.
+
+## 11. Set up a nice React-based frontend using Vite
+1. Test it locally. Make sure it integrates well with the API Gateway endpoint
+2. Build the Vite project which generates a `dist` directory containing all the necessary static assets (HTML, CSS, JavaScript, and other files). You'll need to upload the entire contents of this directory into the S3 bucket

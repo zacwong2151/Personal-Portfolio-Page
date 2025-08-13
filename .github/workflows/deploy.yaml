@@ -33,7 +33,7 @@ jobs:
           aws-region: us-east-1 # Change to your AWS region
 
       - name: Terraform Init 
-        run: terraform init # reads your main.tf file, finds the backend "s3" block, and automatically connects to the S3 bucket and key you have defined there
+        run: terraform init # reads your main.tf file, finds the backend s3 block, and automatically connects to the S3 bucket and key you have defined there
         working-directory: ./infrastructure/frontend # changes the working directory to where your Terraform code is located
 
       - name: Terraform Apply 

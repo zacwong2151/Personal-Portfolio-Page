@@ -1,68 +1,13 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to My Static Website</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-
-<body>
-    <div class="container">
-        <h1>Hello from Terraform!</h1>
-        <p>This is your static website hosted on AWS S3.</p>
-        <p>If you see this page, your Terraform deployment was successful!</p>
-
-        <p>Unique Visitors: <span id="visitor-count">Loading...</span></p>
-
-        <img src="koala.jpg" alt="Alternate text">
-    </div>
-
-    <script>
-        // TODO: map a custom domain name to my API Gateway endpoint, and use that custom domain name here
-        const API_ENDPOINT = "https://gbzinfnjb8.execute-api.us-east-1.amazonaws.com/visitor-count";
-
-        /**
-         * Fetches the unique visitor count from the API Gateway and displays it.
-         * This function makes a POST request to trigger the Lambda, which handles
-         * the unique visitor logic and returns the current count.
-         */
-        async function fetchAndDisplayVisitorCount() {
-            try {
-                const response = await fetch(API_ENDPOINT, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    // Send an empty JSON body as POST requests typically expect one, even if your Lambda doesn't explicitly use its content.
-                    body: JSON.stringify({})
-                });
-
-                const visitorCountElement = document.getElementById('visitor-count');
-
-                if (response.ok) {
-                    const data = await response.json();
-
-                    visitorCountElement.textContent = data.visitorCount;
-                    console.log(data);
-                } else {
-                    const errorData = await response.json();
-
-                    visitorCountElement.textContent = 'Error loading count';
-                    console.error('Failed to get/update visitor count:', response.status, errorData);
-                }
-            } catch (error) {
-                visitorCountElement.textContent = 'Network error';
-                console.error('Network or fetch error:', error);
-            }
-        }
-
-        // Call the function when the page finishes loading
-        // Using DOMContentLoaded is generally preferred as it fires once the HTML is loaded and parsed,
-        // without waiting for stylesheets, images, and subframes to finish loading.
-        document.addEventListener('DOMContentLoaded', fetchAndDisplayVisitorCount);
-    </script>
-</body>
-
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React + TS</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
 </html>

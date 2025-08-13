@@ -7,7 +7,7 @@ resource "aws_apigatewayv2_api" "http_api" {
   cors_configuration {
     allow_headers     = ["Content-Type", "X-Amz-Date", "Authorization", "X-Api-Key", "X-Amz-Security-Token"]
     allow_methods     = ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-    allow_origins     = ["https://${var.website_domain_name}"]
+    allow_origins     = ["https://${var.website_domain_name}", "http://localhost:5173/"]
     allow_credentials = false # Whether credentials are included in the CORS request (e.g., cookies, auth headers)
     max_age           = 300   # Number of seconds that the browser should cache preflight request results
   }

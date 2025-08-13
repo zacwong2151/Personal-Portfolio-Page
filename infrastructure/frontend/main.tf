@@ -18,7 +18,7 @@ module "S3_buckets" {
 
   website_bucket_name         = var.website_bucket_name
   terraform_state_bucket_name = var.terraform_state_bucket_name
-  web_files_path              = "../../frontend"
+  web_files_path              = var.web_files_path
   cloudfront_arn              = module.CloudFront.cloudfront_arn
   cloudfront_custom_header    = random_string.origin_access_header_value.result
 }
