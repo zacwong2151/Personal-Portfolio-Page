@@ -1,12 +1,38 @@
+# Project Overview
+<img src="./markdown-images/Flowchart.png" alt="Flowchart"/>
+
+> Flowchart made using Lucidchart
+
+#### 1. User accesses my website via my custom domain
+- A user enters my custom domain name (e.g., loonymoony.click) into their browser. Route 53, acting as the Domain Name System (DNS) service, resolves the domain name to the IP address of my CloudFront distribution.
+
+#### 2. The request is directed to the nearest edge location
+- The user's request is routed to the nearest CloudFront edge location to minimize latency.
+    - If the requested content (e.g., HTML, CSS, JavaScript files) is already cached at the edge location (cache hit), CloudFront serves the content directly to the user.
+    - If the content is not cached (cache miss), CloudFront forwards the request to the designated origin, which is my S3 static website bucket. S3 retrieves the file, and CloudFront caches it for future requests before delivering it to the user.
+
+#### 3. Secure communication is established
+- ACM is used to provision an SSL/TLS certificate for my custom domain. This certificate is associated with the CloudFront distribution, enabling secure HTTPS connections between the user's browser and the CloudFront edge locations.
+
+#### 4. The frontend initiates a backend request
+- Once the web files are loaded in the user's browser, the JavaScript code makes a POST request to the backend API. The API call is sent to a custom domain mapped to an API Gateway endpoint. API Gateway acts as the secure entry point for my backend, routing the request to the integrated Lambda function.
+
+#### 5. The backend processes the request
+- The Lambda function is invoked by API Gateway. The Lambda function, which has an associated IAM role granting it permissions to access DynamoDB, executes the logic for the visitor count. It connects to the DynamoDB table to retrieve the current count, increments it, and writes the updated count back to the table. Finally, the Lambda function returns the new visitor count in a response object, which is sent back to the user's browser via API Gateway.
+
+<br/>
+<br/>
+<br/>
+
 # Steps to recreate project
-> Note that the following steps are general guidelines if using the AWS console. Everything from step 2 onwards has to be done using Terraform
+> Note that the following steps are general guidelines. Everything from step 2 onwards has to be done using Terraform
 
 ## 1. Create AWS account
 1. Under account settings, enable the setting for 'Activate IAM Access'
 2. Enable MFA for the root user (later on, need enable MFA for all IAM users as well)
 3. Configure a budget (additionally, under 'Billing Preferences', enable the settings there)
 4. Create an IAM user with administrator privileges (use this IAM user for your all work)
-5. Create an access key pair so that you can run a terraform script from your CLI
+5. Create an access key pair to gain AWS credentials to make changes to your AWS infra
 6. Create a named profile on the CLI using the command `aws configure --profile <insert-your-profile-name-here>`
     - To test if configured properly, try `aws configure list --profile <insert-your-profile-name-here>`
 
@@ -45,7 +71,7 @@
 ## 8. Expose your Lambda via an endpoint in an API Gateway
 1. Create a HTTP API
 2. Integrate this API with your Lambda function
-3. Configure a route for your HTTP API which is a PUT method with a specific path name
+3. Configure a route for your HTTP API which is a POST method with a specific path name
 
 ## 8.1 Consideration when choosing API Gateway or Lambda Function URL
 | | API Gateway | Function URL |
@@ -73,6 +99,7 @@
 | Private APIs | No direct support for private API endpoints (you'd need a private ALB) | Can create private endpoints accessible only from within your VPC using VPC Endpoints |
 
 ## 9. Display visitor count in frontend
+1. Make a simple API call to the backend API Gateway endpoint
 
 ## 10. Set up a workflow in Github Actions
 1. This workflow will automatically upload your frontend code to your S3 bucket whenever you change the frontend code and push it to the master branch
@@ -84,3 +111,15 @@
 ## 11. Set up a nice React-based frontend using Vite
 1. Test it locally. Make sure it integrates well with the API Gateway endpoint
 2. Build the Vite project which generates a `dist` directory containing all the necessary static assets (HTML, CSS, JavaScript, and other files). You'll need to upload the entire contents of this directory into the S3 bucket
+
+## 12. Draw a nice flowchart depicting the sequence of events when a user enters my website
+1. Update `README` with the details. Done!
+
+<br/>
+<br/>
+<br/>
+
+# Quick notes about REST API design
+- `PUT`: typically used for idempotent updates to a known resource. If you `PUT` the same resource multiple times with the same payload, the result should be the same as if you did it once. It's often used to update an existing resource. `PUT` is often associated with sending the entire state of the resource.
+- `POST`: is used to create a new resource or to perform a non-idempotent operation on a resource. `POST` is a very common method for submitting data or triggering actions in APIs.
+- `GET`: is strictly for retrieving data. A `GET` operation must not alter server state.
