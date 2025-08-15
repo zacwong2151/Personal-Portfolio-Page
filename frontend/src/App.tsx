@@ -6,8 +6,15 @@ import { Projects } from './components/Projects';
 import { Education } from './components/Education';
 import { Resume } from './components/Resume';
 import { SectionItems, type SectionId } from './data/sectionItems';
+import * as z from 'zod';
 
 export type VisitorCountLoadingState = 'Loading..' | 'Error loading count' | 'Network error';
+
+const API_RESPONSE = z.object({
+  message: z.string(),
+  clientIp: z.ipv4(),
+  visitorCount: z.int().gte(0),
+});
 
 export const App = () => {
   const [activeSection, setActiveSection] = useState<SectionId>('about');
@@ -27,21 +34,24 @@ export const App = () => {
           body: JSON.stringify({}),
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          setVisitorCount(data.visitorCount);
-
-          console.log(data);
-        } else {
+        if (!response.ok) {
           const errorData = await response.json();
           setVisitorCount('Error loading count');
 
           console.error('Failed to get/update visitor count:', response.status, errorData);
+          return;
+        }
+    
+        const result = API_RESPONSE.safeParse(await response.json())
+        if (result.success) {
+            setVisitorCount(result.data.visitorCount);
+        } else {
+            setVisitorCount("Error loading count");
+
+            console.error("Invalid schema returned from Lambda function", result.error)
         }
       } catch (error) {
         setVisitorCount('Network error');
-
-        console.error('Network error');
       }
     };
     fetchVisitorCount();
