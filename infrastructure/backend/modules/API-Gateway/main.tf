@@ -1,7 +1,8 @@
 # 1. Create the API Gateway HTTP API
 resource "aws_apigatewayv2_api" "http_api" {
-  name          = "IncrementVisitorCountApi" # Name of the API
-  protocol_type = "HTTP"
+  name                         = "IncrementVisitorCountApi" # Name of the API
+  protocol_type                = "HTTP"
+  disable_execute_api_endpoint = true # By disabling the default endpoint, clients can access your API only by using a custom domain name
 
   # Enable CORS for your frontend to call this API
   cors_configuration {
@@ -56,3 +57,25 @@ resource "aws_lambda_permission" "apigw_lambda_permission" {
   # If you wanted to restrict to a specific route/method, it would be:
   # arn:aws:execute-api:REGION:ACCOUNT_ID:API_ID/STAGE_NAME/METHOD/PATH
 }
+
+# Create a custom domain name in API Gateway. This allows you to use a domain name that you own for your API 
+resource "aws_apigatewayv2_domain_name" "api_domain_name" {
+  domain_name = var.api_domain_name
+
+  # Associate an ACM certificate with your custom domain name
+  domain_name_configuration {
+    certificate_arn = var.acm_cert_arn
+    endpoint_type   = "REGIONAL" # Or "EDGE" if you're using CloudFront in front of the API
+    security_policy = "TLS_1_2"
+  }
+}
+
+# Create the API Mapping. You use API mappings to connect API stages to a custom domain name
+resource "aws_apigatewayv2_api_mapping" "api_mapping" {
+  api_id      = aws_apigatewayv2_api.http_api.id
+  domain_name = aws_apigatewayv2_domain_name.api_domain_name.id
+  stage       = aws_apigatewayv2_stage.default_stage.id
+  # If you want a base path, you can set it here:
+  # api_mapping_key = "v1" # This would make the URL `api.loonymoony.click/v1/visitor-count`
+}
+

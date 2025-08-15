@@ -146,9 +146,6 @@ export const handler = async (event, context) => {
             statusCode: 200,
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*", // IMPORTANT: Restrict this to your actual website domain in production!
-                "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS", // Ensure PUT is allowed
-                "Access-Control-Allow-Headers": "Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token",
             },
             body: JSON.stringify({
                 message: isNewVisitor ? "Unique visitor count incremented" : "Visitor count fetched (not incremented)",
@@ -164,9 +161,6 @@ export const handler = async (event, context) => {
             statusCode: 500,
             headers: {
                 "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*", // IMPORTANT: Restrict this to your actual website domain in production!
-                "Access-Control-Allow-Methods": "GET, POST, PUT, OPTIONS",
-                "Access-Control-Allow-Headers": "Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token",
             },
             body: JSON.stringify({ 
                 message: "Failed to process client TTL or visitor count", 

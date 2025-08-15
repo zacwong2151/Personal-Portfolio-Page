@@ -113,7 +113,14 @@
 2. Build the Vite project which generates a `dist` directory containing all the necessary static assets (HTML, CSS, JavaScript, and other files). You'll need to upload the entire contents of this directory into the S3 bucket
 
 ## 12. Draw a nice flowchart depicting the sequence of events when a user enters my website
-1. Update `README` with the details. Done!
+1. Update `README` with the details
+
+## 13. Map a custom domain name to my API Gateway endpoint
+1. Request a SSL certificate from ACM for the domain `api.loonymoony.click`
+2. Validate ownership of the domain
+3. Create a API Gateway Custom Domain Name resource, which allows you to use a domain name that you own for your API. Here, you also associate an ACM certificate with your custom domain name 
+4. Create the API Mapping, which allows API Gateway to connect API stages to a custom domain name
+5. Create the Route53 DNS record that points your custom domain `api.loonymoony.click` to the API Gateway
 
 <br/>
 <br/>

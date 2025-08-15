@@ -13,8 +13,7 @@ export const App = () => {
   const [activeSection, setActiveSection] = useState<SectionId>('about');
   const [visitorCount, setVisitorCount] = useState<VisitorCountLoadingState | number>('Loading..');
 
-  // TODO: map a custom domain name to my API Gateway endpoint, and use that custom domain name here
-  const API_ENDPOINT = 'https://gbzinfnjb8.execute-api.us-east-1.amazonaws.com/visitor-count';
+  const API_ENDPOINT = 'https://api.loonymoony.click/visitor-count';
 
   useEffect(() => {
     const fetchVisitorCount = async () => {

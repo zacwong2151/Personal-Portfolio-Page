@@ -1,4 +1,5 @@
-import { internships } from '../data/internships';
+import { internships, type internship } from '../data/internships';
+
 
 export const Experience = () => {
   return (
@@ -12,7 +13,7 @@ export const Experience = () => {
       <div className="max-w-5xl mx-auto px-8">
         <div className="bg-gray-100 p-8 rounded-lg">
           <div className="space-y-8">
-            {internships.map((internship, index) => {
+            {internships.map((internship: internship, index) => {
               return (
                 <div
                   key={index}

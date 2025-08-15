@@ -1,4 +1,4 @@
-type internship = {
+export type internship = {
   company: string;
   role: string;
   duration: string;
