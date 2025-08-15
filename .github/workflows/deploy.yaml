@@ -4,38 +4,40 @@
 
 name: Deploy Frontend to S3
 
-on:
-  push:
-    branches:
-      - master  # Or `main`, depending on your branch name
-    paths:
-      - 'frontend/**'  # Trigger only when files in the frontend folder change
-      - 'infrastructure/frontend/**' # Also trigger if IaC for frontend changes
+# Commented the whole thing out because it seems to be destroying my S3 objects for some reason
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# on:
+#   push:
+#     branches:
+#       - master  # Or `main`, depending on your branch name
+#     paths:
+#       - 'frontend/**'  # Trigger only when files in the frontend folder change
+#       - 'infrastructure/frontend/**' # Also trigger if IaC for frontend changes
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
     
-    steps:
-      - name: Checkout code # pulls your entire repository onto the runner
-        uses: actions/checkout@v3
+#     steps:
+#       - name: Checkout code # pulls your entire repository onto the runner
+#         uses: actions/checkout@v3
 
-      - name: Set up Terraform # This is a pre-built action from HashiCorp that installs a specific version of Terraform on the runner.
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.5.0 # Or the version you are using
+#       - name: Set up Terraform # This is a pre-built action from HashiCorp that installs a specific version of Terraform on the runner.
+#         uses: hashicorp/setup-terraform@v2
+#         with:
+#           terraform_version: 1.5.0 # Or the version you are using
 
-      - name: Configure AWS Credentials # This is an official AWS action that configures your AWS credentials as environment variables on the runner using the secrets you stored in GitHub.
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1 # Change to your AWS region
+#       - name: Configure AWS Credentials # This is an official AWS action that configures your AWS credentials as environment variables on the runner using the secrets you stored in GitHub.
+#         uses: aws-actions/configure-aws-credentials@v2
+#         with:
+#           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#           aws-region: us-east-1 # Change to your AWS region
 
-      - name: Terraform Init 
-        run: terraform init # reads your main.tf file, finds the backend s3 block, and automatically connects to the S3 bucket and key you have defined there
-        working-directory: ./infrastructure/frontend # changes the working directory to where your Terraform code is located
+#       - name: Terraform Init 
+#         run: terraform init # reads your main.tf file, finds the backend s3 block, and automatically connects to the S3 bucket and key you have defined there
+#         working-directory: ./infrastructure/frontend # changes the working directory to where your Terraform code is located
 
-      - name: Terraform Apply 
-        run: terraform apply -auto-approve # the -auto-approve flag is used for CI/CD environments to automatically apply changes without requiring manual confirmation
-        working-directory: ./infrastructure/frontend
+#       - name: Terraform Apply 
+#         run: terraform apply -auto-approve # the -auto-approve flag is used for CI/CD environments to automatically apply changes without requiring manual confirmation
+#         working-directory: ./infrastructure/frontend
