@@ -22,7 +22,6 @@
 
 <br/>
 <br/>
-<br/>
 
 # Steps to recreate project
 > Note that the following steps are general guidelines. Everything from step 2 onwards has to be done using Terraform
@@ -124,9 +123,31 @@
 
 <br/>
 <br/>
-<br/>
 
-# Quick notes about REST API design
+## Quick notes about REST API design
 - `PUT`: typically used for idempotent updates to a known resource. If you `PUT` the same resource multiple times with the same payload, the result should be the same as if you did it once. It's often used to update an existing resource. `PUT` is often associated with sending the entire state of the resource.
 - `POST`: is used to create a new resource or to perform a non-idempotent operation on a resource. `POST` is a very common method for submitting data or triggering actions in APIs.
 - `GET`: is strictly for retrieving data. A `GET` operation must not alter server state.
+
+## Quick notes about `.json()` and `.stringify()`
+- `.json()` -> Parses a JSON object, and returns a Promise that resolves to a Javascript object
+- `.stringify()` -> Converts a Javascript object to JSON
+
+<br/>
+<br/>
+
+# Tips to set up project
+- Run `npm install` in the `/frontend` folder if the `node_modules` folder is absent 
+- Run `npm run build` to generate the `dist` directory, before running `terraform plan` and `terraform apply` in the `/infrastructure/frontend` folder
+- Ensure you have created a AWS named profile with access key pair credentials in your CLI, then run `export AWS_PROFILE=<insert-profile-name-here>` command in your CLI. This allows you to make changes to your AWS infrastructure by running your Terraform script. Note that there is no hard coded profile name in the Terraform code, so you can be assured that the Terraform AWS Provider will obtain AWS credentials through the `AWS_PROFILE` env variable
+- You shouldn't receive a CORS error, but if you do, change the CORS configuration of the API Gateway API to allow from `*`
+
+<br/>
+<br/>
+
+# Resources
+- [learn.cantrill.io](https://learn.cantrill.io/) -> everything you need to know about AWS
+- [Reddit post](https://www.reddit.com/r/AWSCertifications/comments/1jn6lwl/this_should_be_your_first_cloud_project_tutorial/) -> inspiration for this mini project
+- [Cloud test bank](https://kankoh.notion.site/IS458-Cloud-Management-and-Engineering-f45ae284fcba4089a37d98f0e21e20cb) -> I didn't use this, but might be useful in the future for revision
+- Gemini -> best LLM
+- Claude -> frontend master

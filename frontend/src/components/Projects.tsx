@@ -3,7 +3,7 @@ import { projects } from '../data/projects';
 
 export const Projects = () => {
   return (
-    <section id="projects" className="pb-24">
+    <section id="projects" className="pb-24 bg-teal-700">
       {/* Section Header */}
       <div className="w-full bg-teal-600 py-4 px-8 mb-8">
         <h2 className="text-3xl font-bold text-white uppercase tracking-wide">Projects</h2>

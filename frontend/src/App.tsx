@@ -16,11 +16,12 @@ const API_RESPONSE = z.object({
   visitorCount: z.int().gte(0),
 });
 
+const API_ENDPOINT = 'https://api.loonymoony.click/visitor-count';
+
 export const App = () => {
   const [activeSection, setActiveSection] = useState<SectionId>('about');
   const [visitorCount, setVisitorCount] = useState<VisitorCountLoadingState | number>('Loading..');
 
-  const API_ENDPOINT = 'https://api.loonymoony.click/visitor-count';
 
   useEffect(() => {
     const fetchVisitorCount = async () => {
@@ -83,7 +84,7 @@ export const App = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-teal-600 to-teal-800 flex">
       <Sidebar activeSection={activeSection} />
-      <div className="flex-1 ml-64">
+      <div className="flex-1 md:ml-64">
         <About visitorCount={visitorCount} />
         <Experience />
         <Projects />

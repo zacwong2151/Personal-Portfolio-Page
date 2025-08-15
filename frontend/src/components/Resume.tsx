@@ -2,7 +2,7 @@ import { FileText } from 'lucide-react';
 
 export const Resume = () => {
   return (
-    <section id="resume" className="pb-96">
+    <section id="resume" className="pb-96 bg-teal-700">
       {/* Section Header */}
       <div className="w-full bg-teal-600 py-4 px-8 mb-8">
         <h2 className="text-3xl font-bold text-white uppercase tracking-wide">Resume</h2>

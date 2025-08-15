@@ -1,4 +1,4 @@
-import koala from '../images/koala.jpg';
+import book from '../images/coloured-book.png'
 import { SectionItems } from '../data/sectionItems';
 import { scrollToSection } from '../utils/util';
 import type { SectionId } from '../data/sectionItems';
@@ -9,12 +9,13 @@ export const Sidebar = ({
   activeSection: SectionId;
 }) => {
   return (
-    <div className="w-64 bg-white shadow-lg flex flex-col fixed h-full z-10">
+    // md:flex: Overrides `hidden` on medium screens (md) and larger, making it visible as a flex container
+    <div className="w-64 bg-white shadow-lg flex-col fixed h-full z-10 hidden md:flex">
       <div>
-        <img src={koala} alt="Logo" />
+        <img className="py-4" src={book} alt="Logo" />
       </div>
 
-      <nav className="flex-1 py-4 overflow-y-auto">
+      <nav className="flex-1 py-1 overflow-y-auto">
         {SectionItems.map((item) => {
           const Icon = item.icon;
           return (
